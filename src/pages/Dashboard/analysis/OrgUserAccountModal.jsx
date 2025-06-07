@@ -27,6 +27,7 @@ const OrgUserAccountModal = ({ handleAddAccountClick, addOrgUserAccounts }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true); 
 
         try {
             //conver the datetime-local to utc
@@ -40,6 +41,7 @@ const OrgUserAccountModal = ({ handleAddAccountClick, addOrgUserAccounts }) => {
             console.log('failed to add accounts: ', error);
         }
         finally {
+            setIsLoading(false);
             handleAddAccountClick();
         }
     }
@@ -120,7 +122,7 @@ const OrgUserAccountModal = ({ handleAddAccountClick, addOrgUserAccounts }) => {
                             type="submit"
                             className="rounded-lg bg-orange-500 px-4 py-2 text-sm text-white shadow hover:bg-orange-600"
                         >
-                            Submit
+                            {isLoading ? 'Loading...' : 'Submit'}
                         </button>
                     </div>
                 </form>

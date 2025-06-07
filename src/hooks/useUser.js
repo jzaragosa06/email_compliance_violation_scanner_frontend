@@ -3,18 +3,14 @@ import { fetchUser } from "../services/userService";
 
 export const useUser = () => {
     const [user, setUser] = useState();
-    const [isLoadingUser, setIsLoadingUser] = useState(true);
     const [errorUser, setErrorUser] = useState('');
 
     useEffect(() => {
-
         const fetchUserInfo = async () => {
-            setIsLoadingUser(true);
-
             try {
                 const response = await fetchUser();
                 setUser({
-                    user_email: response.data.user.email,
+                    user_email: response.data.user.user_email,
                     created_at: response.data.user.created_at,
                     first_name: response.data.user.UserInfo.first_name,
                     last_name: response.data.user.UserInfo.last_name,
@@ -27,13 +23,10 @@ export const useUser = () => {
                 console.log(error);
                 setErrorUser(`failed to fetch user. ${error.message}`)
             }
-            finally {
-                setIsLoadingUser(false);
-            }
         }
 
         fetchUserInfo();
     }, []);
 
-    return { user, setUser, isLoadingUser, errorUser };
+    return { user, setUser, errorUser };
 }

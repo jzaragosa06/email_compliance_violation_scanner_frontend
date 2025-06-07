@@ -26,8 +26,8 @@ export default function Hero() {
             </div>
 
             {/* Right: Image Placeholder */}
-            <div className="flex-1 flex justify-center">
-                <div className="w-72 h-72 bg-gray-200 rounded-xl shadow-inner flex items-center justify-center text-gray-500">
+            <div className="flex flex-1 justify-center">
+                <div className="hidden md:flex w-72 h-72 bg-gray-200 rounded-xl shadow-inner items-center justify-center text-gray-500">
                     {/* Replace with an actual image or illustration */}
                     Image
                 </div>

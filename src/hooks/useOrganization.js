@@ -5,11 +5,9 @@ import { addOrg, orgManageByUser } from "../services/orgService";
 export const useOrganization = () => {
     const [organizations, setOrganizations] = useState([]);
     const [selectedOrg, setSelectedOrg] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const fetchOrganizations = async () => {
-        setLoading(true);
 
         try {
             const response = await orgManageByUser();
@@ -27,16 +25,12 @@ export const useOrganization = () => {
             console.error("Error fetching orgs:", error);
             setError(error.message);
         }
-        finally {
-            setLoading(false);
-        }
+
     }
 
     const addOrganization = async (data) => {
         //data (object): org_domain, org_email, org_name (org_phone
         //org_description, org_employee_count, org_logo)
-        setLoading(true);
-
         try {
             const response = await addOrg(data);
 
@@ -54,9 +48,6 @@ export const useOrganization = () => {
         } catch (error) {
             setError(error.message);
         }
-        finally {
-            setLoading(false);
-        }
     }
 
     useEffect(() => {
@@ -68,8 +59,6 @@ export const useOrganization = () => {
         setOrganizations,
         selectedOrg,
         setSelectedOrg,
-        loading,
-        setLoading,
         error,
         setError,
         addOrganization,

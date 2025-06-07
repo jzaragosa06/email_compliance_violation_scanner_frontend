@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { addOrgUserAccount, fetchOrgUserAccountsInOrganization } from "../services/orgUserAccountService"
+import { addOrgUserAccount, fetchOrgUserAccountsInOrganization, updateOrgUserAccountAnalysisStartingDate } from "../services/orgUserAccountService"
+import { fetchViolations, updateViolationStatus } from "../services/violationsService";
 
 export const useOrgUserAccount = (org) => {
     const [accounts, setAccounts] = useState([]);
-    const [isAccountsLoading, setIsAccountsLoading] = useState(true);
-    const [isAddAccountLoading, setIsAddAccountLoading] = useState(true);
+    const [selectedAccount, setSelectedAccount] = useState(null);
+    const [violations, setViolations] = useState([]); 
 
     const addOrgUserAccounts = async (formData) => {
-        setIsAddAccountLoading(true);
         try {
             const response = await addOrgUserAccount(org.org_id, formData);
             console.log('new org user account response: ', response);
@@ -33,15 +33,63 @@ export const useOrgUserAccount = (org) => {
         } catch (error) {
             console.log('Failed to add new accounts', error.message);
         }
-        finally {
-            setIsAddAccountLoading(false);
-        }
     }
+
+    const updateConfirmedViolationStatus = async (email_violation_id, is_confirmed_violation) => {
+        const response = await updateViolationStatus(email_violation_id, { is_confirmed_violation: is_confirmed_violation });
+        console.log('update violation response: ', response);
+
+        return;
+    }
+
+    const updateAnalysisStartDate = async (org_user_account_id, analysis_starting_date) => {
+
+        try {
+            const response = await updateOrgUserAccountAnalysisStartingDate(org_user_account_id, { analysis_starting_date: analysis_starting_date });
+            console.log('update start date', response);
+
+            return;
+        } catch (error) {
+            console.log(error);
+
+        }
+
+    }
+
+
+
+    useEffect(() => {
+        if (!selectedAccount) return;
+
+        //fetch the violation for that account
+        const fetchAccountViolations = async () => {
+            console.log('selected ccounts: ', selectedAccount);
+
+            const response = await fetchViolations(selectedAccount.org_id, selectedAccount.org_user_account_id);
+            //clean it and store it. 
+
+            console.log('selected account violations response', response);
+
+
+            setViolations(response.data.violations.map((v) => ({
+                email_violation_id: v.email_violation_id,
+                is_confirmed_violation: v.is_confirmed_violation,
+                reviewed_at: v.reviewed_at,
+                note: v.note,
+                created_at: v.created_at,
+                email_subject: v.ViolationEvidence.email_subject,
+                evidence_tag: v.ViolationEvidence.evidence_tag.map(tag => tag.replace('_', ' ').toLowerCase()),
+            })));
+
+        }
+
+        fetchAccountViolations();
+
+    }, [selectedAccount]); 
 
     useEffect(() => {
         if (!org) return;
 
-        setIsAccountsLoading(true);
         const fetchOrgUserAccounts = async () => {
             try {
                 const response = await fetchOrgUserAccountsInOrganization(org.org_id);
@@ -49,6 +97,7 @@ export const useOrgUserAccount = (org) => {
 
                 const accounts = response.data.accounts.map(acc => ({
                     org_user_account_id: acc.org_user_account_id,
+                    org_id: acc.org_id, 
                     email: acc.email,
                     created_at: acc.created_at,
                     email_account_auth_id: acc.EmailAccountAuth.email_account_auth_id,
@@ -60,14 +109,10 @@ export const useOrgUserAccount = (org) => {
                     last_analyzed: acc.EmailAnalysisLog.last_analyzed,
                 }));
 
-
                 setAccounts(accounts);
             } catch (error) {
                 console.log('failed to fetch org user accounts', error);
 
-            }
-            finally {
-                setIsAccountsLoading(false);
             }
         }
 
@@ -79,11 +124,12 @@ export const useOrgUserAccount = (org) => {
     return {
         accounts,
         setAccounts,
-        isAccountsLoading,
-        setIsAccountsLoading,
         addOrgUserAccounts,
-        isAddAccountLoading,
-        setIsAddAccountLoading
-
+        selectedAccount,
+        setSelectedAccount,
+        violations,
+        setViolations,
+        updateConfirmedViolationStatus,
+        updateAnalysisStartDate
     }
 }

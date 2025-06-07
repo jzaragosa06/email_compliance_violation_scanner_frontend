@@ -7,6 +7,7 @@ import Analysis from "./analysis/Analysis";
 import OrganizationFormModal from "./organization/OrganizationFormModal";
 import { useEffect, useState } from "react";
 import UserProfile from "./user/UserProfile";
+import ProfileModal from "./user/ProfileModal";
 
 const Dashboard = () => {
     const {
@@ -14,8 +15,6 @@ const Dashboard = () => {
         setOrganizations,
         selectedOrg,
         setSelectedOrg,
-        loading,
-        setLoading,
         error,
         setError,
         addOrganization
@@ -25,13 +24,16 @@ const Dashboard = () => {
     const {
         accounts,
         setAccounts,
-        isAccountsLoading,
-        setIsAccountsLoading,
         addOrgUserAccounts,
-        isAddAccountLoading,
-        setIsAddAccountLoading } = useOrgUserAccount(selectedOrg);
+        selectedAccount,
+        setSelectedAccount,
+        violations,
+        setViolations,
+        updateConfirmedViolationStatus,
+        updateAnalysisStartDate, 
+    } = useOrgUserAccount(selectedOrg);
 
-    const { user, setUser, isLoadingUser, } = useUser();
+    const { user, setUser, } = useUser();
 
     const [activeTab, setActiveTab] = useState('analysis');
     const [isAddOrg, setIsAddOrg] = useState(false);
@@ -42,6 +44,10 @@ const Dashboard = () => {
                 return <Analysis
                     accounts={accounts}
                     addOrgUserAccounts={addOrgUserAccounts}
+                    selectedAccount={selectedAccount}
+                    setSelectedAccount={setSelectedAccount}
+                    violations={violations}
+                    updateConfirmedViolationStatus={updateConfirmedViolationStatus}
                 />;
             case 'organization':
                 return <></>;
@@ -53,29 +59,12 @@ const Dashboard = () => {
     }
 
 
-
-    if (loading) {
-        return <div>loading organizations</div>
-    }
+    // if (loading) {
+    //     return <div>loading organizations</div>
+    // }
 
     if (error) {
         return <div>error: {error}</div>
-    }
-
-    if (!organizations.length) {
-        return (
-            <div>
-                <h2>No organizations found</h2>
-                <button onClick={() => setIsAddOrg(true)}>Add Organization</button>
-                {isAddOrg && (
-                    <OrganizationFormModal
-                        isAddOrg={isAddOrg}
-                        setIsAddOrg={setIsAddOrg}
-                        addOrganization={addOrganization}
-                    />
-                )}
-            </div>
-        );
     }
 
     return (
@@ -90,22 +79,48 @@ const Dashboard = () => {
                 </div>
                 {user && (
                     <UserProfile user={user} />
+
                 )}
             </div>
 
-            <div className="flex">
-                <OrganizationSelector
-                    organizations={organizations}
-                    selectedOrg={selectedOrg}
-                    setSelectedOrg={setSelectedOrg}
-                    setIsAddOrg={setIsAddOrg}
-                />
-                <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+            {organizations.length > 0
+                ? (
+                    <>
+                        <div className="flex">
+                            <OrganizationSelector
+                                organizations={organizations}
+                                selectedOrg={selectedOrg}
+                                setSelectedOrg={setSelectedOrg}
+                                setIsAddOrg={setIsAddOrg}
+                            />
+                            <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+                        </div>
 
-            </div>
-            {/* content */}
-            {renderTabContent()}
+                        {renderTabContent()}
+                    </>
+                )
+                : (
+                    <div className="w-full flex flex-col items-center justify-center px-6 py-12 rounded-2xl bg-white">
+                        <img
+                            src="https://img.freepik.com/premium-vector/market-research-business-flat-style-illustration-kit_220346-303.jpg"
+                            alt="No records illustration"
+                            className="w-64 h-64 object-contain mb-6"
+                        />
+                        <p className="text-lg text-gray-700 mb-4 text-center">
+                            Hey! You have no organizations registered. Add one to start.
+                        </p>
+                        <button
+                            className="px-6 py-2 bg-orange-400 text-white rounded-xl font-medium hover:bg-orange-500 transition"
+                            onClick={() => setIsAddOrg(true)}
+                        >
+                            Add Organization
+                        </button>
+                    </div>
+
+                )
+            }
             {isAddOrg && <OrganizationFormModal isAddOrg={isAddOrg} setIsAddOrg={setIsAddOrg} addOrganization={addOrganization} />}
+
         </div>
     )
 }

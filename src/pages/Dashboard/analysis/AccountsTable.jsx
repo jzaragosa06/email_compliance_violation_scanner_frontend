@@ -1,5 +1,6 @@
+import { useState } from "react";
 import DataTable from "react-data-table-component";
-
+import { toLocalTime } from "../../../utils/date"; 
 
 const columns = [
     {
@@ -34,13 +35,34 @@ const columns = [
         sortable: true,
         cell: row => (
             <div className="font-semibold">
-                {row.last_analyzed ? new Date(row.last_analyzed).toLocaleString() : 'Not yet analyzed'}
+                {row.last_analyzed ? toLocalTime(row.last_analyzed) : 'Not yet analyzed'}
             </div>
         )
     }
 ];
 
-const AccountsTable = ({ accounts }) => {
+
+
+
+const AccountsTable = ({ accounts, setSelectedAccount }) => {
+    const [clickedRowId, setClickedRowId] = useState(null);
+
+    const handleRowClick = (row) => {
+        //row = account (object in accounts)
+        setSelectedAccount(row);
+        setClickedRowId(row.email);
+    }
+
+    const conditionalRowStyles = [
+        {
+            when: row => row.email === clickedRowId,
+            style: {
+                backgroundColor: '#e0f7fa',
+                color: 'black',
+            }
+        }
+    ]
+
     return (
         <div>
             <DataTable
@@ -49,7 +71,8 @@ const AccountsTable = ({ accounts }) => {
                 pagination
                 selectableRows
                 highlightOnHover
-
+                onRowClicked={handleRowClick}
+                conditionalRowStyles={conditionalRowStyles}
             />
         </div>
     )
