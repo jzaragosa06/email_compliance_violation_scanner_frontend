@@ -7,13 +7,16 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "flowbite-react patch"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
     "@heroicons/react": "^2.2.0",
+    "@material-tailwind/html": "^3.0.0-beta.7",
     "@tailwindcss/vite": "^4.1.7",
     "axios": "^1.9.0",
+    "flowbite-react": "^0.11.8",
     "luxon": "^3.6.1",
     "react": "^19.1.0",
     "react-data-table-component": "^7.7.0",
