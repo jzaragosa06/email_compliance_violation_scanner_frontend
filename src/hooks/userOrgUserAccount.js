@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { addOrgUserAccount, fetchOrgUserAccountsInOrganization, updateOrgUserAccountAnalysisStartingDate } from "../services/orgUserAccountService"
+import { addOrgUserAccount, analyzeAccountForViolations, analyzeAllAuthenticatedAccountsForViolations, fetchOrgUserAccountsInOrganization, updateAccountActiveStatus, updateOrgUserAccountAnalysisStartingDate } from "../services/orgUserAccountService"
 import { fetchViolations, updateViolationStatus } from "../services/violationsService";
 
 export const useOrgUserAccount = (org) => {
@@ -68,7 +68,87 @@ export const useOrgUserAccount = (org) => {
 
     }
 
+    const updateAccountStatus = async (org_user_account_id, is_active) => {
+        try {
+            const response = await updateAccountActiveStatus(org_user_account_id, { is_active });
+            console.log('update status response: ', response);
 
+            // Corrected map usage
+            setAccounts(prev =>
+                prev.map(acc =>
+                    acc.org_user_account_id === org_user_account_id
+                        ? { ...acc, is_active }
+                        : acc
+                )
+            );
+
+            return;
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    };
+
+    const analyzeAccount = async (email) => {
+        try {
+            const response = await analyzeAccountForViolations(org.org_id, { emails: [email] });
+
+            console.log('new violations', response);
+
+            //update the contents of violation by making another api call
+            if (selectedAccount && selectedAccount.email == email) {
+                const violationResponse = await fetchViolations(selectedAccount.org_id, selectedAccount.org_user_account_id);
+                //clean it and store it. 
+                setViolations(violationResponse.data.violations.map((v) => ({
+                    email_violation_id: v.email_violation_id,
+                    is_confirmed_violation: v.is_confirmed_violation,
+                    reviewed_at: v.reviewed_at,
+                    note: v.note,
+                    created_at: v.created_at,
+                    email_subject: v.ViolationEvidence.email_subject,
+                    evidence_tag: v.ViolationEvidence.evidence_tag.map(tag => tag.replace('_', ' ').toLowerCase()),
+                })));
+            }
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
+
+    const analyzeAllAccount = async () => {
+        try {
+            const response = await analyzeAllAuthenticatedAccountsForViolations(org.org_id);
+            console.log('analyze all account', response);
+
+            //make another api call to fetch violations
+            //this is the case when there is a selected account 
+            //and there is a panel on the right. 
+            //we need to update it. 
+            if (selectedAccount) {
+                const violationResponse = await fetchViolations(selectedAccount.org_id, selectedAccount.org_user_account_id);
+                //clean it and store it. 
+                setViolations(violationResponse.data.violations.map((v) => ({
+                    email_violation_id: v.email_violation_id,
+                    is_confirmed_violation: v.is_confirmed_violation,
+                    reviewed_at: v.reviewed_at,
+                    note: v.note,
+                    created_at: v.created_at,
+                    email_subject: v.ViolationEvidence.email_subject,
+                    evidence_tag: v.ViolationEvidence.evidence_tag.map(tag => tag.replace('_', ' ').toLowerCase()),
+                })));
+            }
+
+            //we can just extract the number of identified violations. 
+            return {
+                processedAccount: response.data.result.processedOrgUserAccountCount,
+                errorsCount: response.data.result.errorsCount,
+                violationsCount: response.data.result.violationsCount,
+            };
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
 
     useEffect(() => {
         if (!selectedAccount) return;
@@ -131,8 +211,6 @@ export const useOrgUserAccount = (org) => {
         fetchOrgUserAccounts();
     }, [org]);
 
-
-
     return {
         accounts,
         setAccounts,
@@ -142,6 +220,9 @@ export const useOrgUserAccount = (org) => {
         violations,
         setViolations,
         updateConfirmedViolationStatus,
-        updateAnalysisStartDate
+        updateAnalysisStartDate,
+        updateAccountStatus,
+        analyzeAccount,
+        analyzeAllAccount, 
     }
 }

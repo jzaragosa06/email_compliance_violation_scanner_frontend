@@ -2,11 +2,21 @@ import { useState } from "react";
 import { toLocalTime } from "../../../utils/Date";
 import { Switch } from '@headlessui/react'
 import { CheckIcon, XMarkIcon } from "@heroicons/react/16/solid";
+import { Tooltip } from "flowbite-react";
 
+const Violation = ({
+    account,
+    violations,
+    updateConfirmedViolationStatus,
+    setSelectedAccount,
+    updateAnalysisStartDate,
+    analyzeAccount }) => {
 
-const Violation = ({ account, violations, updateConfirmedViolationStatus, setSelectedAccount, updateAnalysisStartDate }) => {
     const violationsCount = violations.length;
     const confirmedViolationsCount = violations.filter(v => v.is_confirmed_violation).length;
+    const [isUpdateDate, setIsUpdateDate] = useState(false);
+    const [isAnalyzeLoading, setIsAnalyzeLoading] = useState(false);
+    const isDisabled = !account.is_authenticated || isAnalyzeLoading;
 
     const handleChangedConfirmedViolationStatus = async (email_violation_id, current_is_confirmed_violation) => {
         const new_is_confirmed_violation = !current_is_confirmed_violation;
@@ -19,8 +29,6 @@ const Violation = ({ account, violations, updateConfirmedViolationStatus, setSel
         }
     }
 
-    const [isUpdateDate, setIsUpdateDate] = useState(false);
-
     const handleSubmitUpdateDate = async (e) => {
         e.preventDefault();
         try {
@@ -31,6 +39,18 @@ const Violation = ({ account, violations, updateConfirmedViolationStatus, setSel
             setIsUpdateDate(false);
         } catch (error) {
             alert(error);
+        }
+    }
+
+    const handleAnalyze = async () => {
+        try {
+            setIsAnalyzeLoading(true);
+            await analyzeAccount(account.email);
+        } catch (error) {
+            console.log(error);
+        }
+        finally {
+            setIsAnalyzeLoading(false);
         }
     }
 
@@ -79,9 +99,29 @@ const Violation = ({ account, violations, updateConfirmedViolationStatus, setSel
                     )}
                 </div>
 
-                <button className="px-4 py-2 text-sm text-white font-semibold bg-orange-400 rounded-lg hover:bg-orange-500">
-                    Analyze
+                <button
+                    onClick={handleAnalyze}
+                    disabled={isDisabled}
+                    className={`px-4 py-2 text-sm font-semibold rounded-lg transition min-w-[100px] flex justify-center items-center
+                        ${isDisabled
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-orange-400 text-white hover:bg-orange-500 cursor-pointer'}
+                    `}
+                >
+                    {isAnalyzeLoading ? (
+                        <>
+                            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span className="sr-only">Analyze</span>
+                        </>
+                    ) : account.is_authenticated ? (
+                        "Analyze"
+                    ) : (
+                        <Tooltip content="User unauthenticated" style="light" className="text-xs">
+                            Analyze
+                        </Tooltip>
+                    )}
                 </button>
+
             </div>
 
             <div className="flex space-x-3">

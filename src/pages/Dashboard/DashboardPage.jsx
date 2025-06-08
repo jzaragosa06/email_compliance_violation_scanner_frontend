@@ -31,6 +31,9 @@ const Dashboard = () => {
         setViolations,
         updateConfirmedViolationStatus,
         updateAnalysisStartDate, 
+        updateAccountStatus,
+        analyzeAccount,
+        analyzeAllAccount, 
     } = useOrgUserAccount(selectedOrg);
 
     const { user, setUser, } = useUser();
@@ -49,6 +52,9 @@ const Dashboard = () => {
                     violations={violations}
                     updateConfirmedViolationStatus={updateConfirmedViolationStatus}
                     updateAnalysisStartDate={updateAnalysisStartDate}
+                    updateAccountStatus={updateAccountStatus}
+                    analyzeAccount={analyzeAccount}
+                    analyzeAllAccount={analyzeAllAccount}
                 />;
             case 'organization':
                 return <></>;
@@ -58,11 +64,6 @@ const Dashboard = () => {
                 return <></>;
         }
     }
-
-
-    // if (loading) {
-    //     return <div>loading organizations</div>
-    // }
 
     if (error) {
         return <div>error: {error}</div>
