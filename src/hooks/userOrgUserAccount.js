@@ -36,22 +36,34 @@ export const useOrgUserAccount = (org) => {
     }
 
     const updateConfirmedViolationStatus = async (email_violation_id, is_confirmed_violation) => {
-        const response = await updateViolationStatus(email_violation_id, { is_confirmed_violation: is_confirmed_violation });
-        console.log('update violation response: ', response);
+
+        try {
+            const response = await updateViolationStatus(email_violation_id, { is_confirmed_violation: is_confirmed_violation });
+            console.log('update violation response: ', response);
+        } catch (error) {
+            console.log(error);
+            throw error;
+
+        }
 
         return;
     }
 
     const updateAnalysisStartDate = async (org_user_account_id, analysis_starting_date) => {
-
         try {
             const response = await updateOrgUserAccountAnalysisStartingDate(org_user_account_id, { analysis_starting_date: analysis_starting_date });
             console.log('update start date', response);
 
+            //update the state of the acccounts
+            setAccounts((prev) => prev.map(acc => acc.org_user_account_id === org_user_account_id ? { ...acc, analysis_starting_date: analysis_starting_date } : acc))
+
+            //update the selectedAccounts
+            setSelectedAccount((prev) => ({ ...prev, analysis_starting_date: analysis_starting_date }))
+
             return;
         } catch (error) {
             console.log(error);
-
+            throw error
         }
 
     }

@@ -60,7 +60,6 @@ const OrgUserAccountModal = ({ handleAddAccountClick, addOrgUserAccounts }) => {
                         <div className="col-span-5">Analysis Starting Date</div>
                         <div className="col-span-2 text-center">Action</div>
                     </div>
-
                     {/* Dynamic Inputs */}
                     {accounts.map((acc, index) => (
                         <div

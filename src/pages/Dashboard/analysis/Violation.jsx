@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { toLocalTime } from "../../../utils/Date";
 import { Switch } from '@headlessui/react'
+import { CheckIcon, XMarkIcon } from "@heroicons/react/16/solid";
 
 
 const Violation = ({ account, violations, updateConfirmedViolationStatus, setSelectedAccount, updateAnalysisStartDate }) => {
@@ -19,33 +20,112 @@ const Violation = ({ account, violations, updateConfirmedViolationStatus, setSel
     }
 
     const [isUpdateDate, setIsUpdateDate] = useState(false);
+    const [startDate, setStartDate] = useState('');
 
-    const handleSubmitUpdateDate = async () => {
-        await updateAnalysisStartDate(account.org_user_account_id,);
+    const handleSubmitUpdateDate = async (e) => {
+        e.preventDefault();
+        try {
+            const utcStartDate = new Date(startDate).toISOString();
+            await updateAnalysisStartDate(account.org_user_account_id, utcStartDate);
 
+            //go back to readonly vesion. 
+            setIsUpdateDate(false);
+        } catch (error) {
+            alert(error);
+        }
     }
+
 
     return (
         <div className="flex flex-col w-full px-3 py-2">
-            <div className="flex justify-between">
+            {/* <div className="flex justify-between">
                 <span className="flex flex-col">
                     <p className="text-sm font-semibold">{account.email}</p>
                     <p className="text-xs font-light">Added: {toLocalTime(account.created_at)}</p>
                     {isUpdateDate ? (
-                        <p className="text-xs font-light">Analysis started on eid: {toLocalTime(account.created_at)}</p>
+                        <div>
+                            <p className="text-xs font-light">Analysis Starting Date: </p>
+                            <form onSubmit={handleSubmitUpdateDate}>
+                                <input
+                                    type="date"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                />
+                                <button type="submit">
+                                    <CheckIcon className="w-4 h-4 bg-gray-200 " />
+                                </button>
+
+                                <button
+                                    onClick={() => setIsUpdateDate(!isUpdateDate)}
+                                >
+                                    <XMarkIcon className="w-4 h-4 bg-gray-200 " />
+                                </button>
+
+                            </form>
+                        </div>
 
                     ) : (
                         <div className="flex gap-x-2">
-                            <p className="text-xs font-light">Analysis started on: {toLocalTime(account.created_at)}</p>
+                                <p className="text-xs font-light">Analysis started on: {toLocalTime(account.analysis_starting_date)}</p>
                             <button
                                 onClick={() => setIsUpdateDate(!isUpdateDate)}
                                 className="text-xs p-1 bg-gray-200 hover:bg-gray-300"
-                            >Edit</button>
+                                >
+                                    Edit
+                                </button>
+
                         </div>
                     )}
                 </span>
                 <button className="px-4 py-2 text-sm text-white font-semibold bg-orange-400 rounded-lg hover:bg-orange-500">Analyze</button>
+            </div> */}
+            <div className="flex justify-between items-start gap-4">
+                <div className="flex flex-col text-sm space-y-1">
+                    <p className="font-semibold">{account.email}</p>
+                    <p className="text-xs font-light">Added: {toLocalTime(account.created_at)}</p>
+
+                    {isUpdateDate ? (
+                        <div className="space-y-1">
+                            <p className="text-xs font-light">Analysis Starting Date:</p>
+                            <form onSubmit={handleSubmitUpdateDate} className="flex items-center gap-2">
+                                <input
+                                    type="date"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                    className="text-xs border border-gray-300 rounded px-2 py-1"
+                                />
+                                <button type="submit" className="p-1 rounded hover:bg-gray-300">
+                                    <CheckIcon className="w-4 h-4 text-gray-700" />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsUpdateDate(false)}
+                                    className="p-1 rounded hover:bg-gray-300"
+                                >
+                                    <XMarkIcon className="w-4 h-4 text-gray-700" />
+                                </button>
+                            </form>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2 text-xs text-gray-700">
+                            <p className="font-light">
+                                Analysis started on: {toLocalTime(account.analysis_starting_date)}
+                            </p>
+                            <button
+                                onClick={() => setIsUpdateDate(true)}
+                                className="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-xs"
+                            >
+                                Edit
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                <button className="px-4 py-2 text-sm text-white font-semibold bg-orange-400 rounded-lg hover:bg-orange-500">
+                    Analyze
+                </button>
             </div>
+
             <div className="flex space-x-3">
                 <div className="flex flex-col justify-center items-center px-8 py-4 space-y-2">
                     <div className="flex text-sm w-12 h-12 items-center justify-center font-semibold bg-orange-400 text-white rounded-full">

@@ -48,6 +48,7 @@ const Dashboard = () => {
                     setSelectedAccount={setSelectedAccount}
                     violations={violations}
                     updateConfirmedViolationStatus={updateConfirmedViolationStatus}
+                    updateAnalysisStartDate={updateAnalysisStartDate}
                 />;
             case 'organization':
                 return <></>;
