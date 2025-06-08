@@ -34,6 +34,7 @@ const Dashboard = () => {
         updateAccountStatus,
         analyzeAccount,
         analyzeAllAccount, 
+        searchAccount, 
     } = useOrgUserAccount(selectedOrg);
 
     const { user, setUser, } = useUser();
@@ -55,6 +56,7 @@ const Dashboard = () => {
                     updateAccountStatus={updateAccountStatus}
                     analyzeAccount={analyzeAccount}
                     analyzeAllAccount={analyzeAllAccount}
+                    searchAccount={searchAccount}
                 />;
             case 'organization':
                 return <></>;

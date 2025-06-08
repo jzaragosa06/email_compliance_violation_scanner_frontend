@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { addOrgUserAccount, analyzeAccountForViolations, analyzeAllAuthenticatedAccountsForViolations, fetchOrgUserAccountsInOrganization, updateAccountActiveStatus, updateOrgUserAccountAnalysisStartingDate } from "../services/orgUserAccountService"
+import { addOrgUserAccount, analyzeAccountForViolations, analyzeAllAuthenticatedAccountsForViolations, fetchOrgUserAccountsInOrganization, findOrgUserAccountsInOrganization, updateAccountActiveStatus, updateOrgUserAccountAnalysisStartingDate } from "../services/orgUserAccountService"
 import { fetchViolations, updateViolationStatus } from "../services/violationsService";
 
 export const useOrgUserAccount = (org) => {
@@ -150,6 +150,27 @@ export const useOrgUserAccount = (org) => {
         }
     }
 
+    const searchAccount = async (query) => {
+        const response = await findOrgUserAccountsInOrganization(org.org_id, query);
+        console.log('searched accounts response', response);
+
+        const accounts = response.data.accounts.map(acc => ({
+            org_user_account_id: acc.org_user_account_id,
+            org_id: acc.org_id,
+            email: acc.email,
+            created_at: acc.created_at,
+            email_account_auth_id: acc.EmailAccountAuth.email_account_auth_id,
+            email_account_status_id: acc.EmailAccountStatus.email_account_status_id,
+            is_authenticated: acc.EmailAccountStatus.is_authenticated,
+            is_active: acc.EmailAccountStatus.is_active,
+            analysis_log_id: acc.EmailAnalysisLog.analysis_log_id,
+            analysis_starting_date: acc.EmailAnalysisLog.analysis_starting_date,
+            last_analyzed: acc.EmailAnalysisLog.last_analyzed,
+        }));
+
+        setAccounts(accounts);
+    }
+
     useEffect(() => {
         if (!selectedAccount) return;
 
@@ -224,5 +245,6 @@ export const useOrgUserAccount = (org) => {
         updateAccountStatus,
         analyzeAccount,
         analyzeAllAccount, 
+        searchAccount, 
     }
 }

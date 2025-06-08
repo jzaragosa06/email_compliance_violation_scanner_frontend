@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AccountsTable from "./AccountsTable";
 import { PlusIcon } from "@heroicons/react/16/solid";
 import OrgUserAccountModal from "./OrgUserAccountModal";
@@ -16,13 +16,16 @@ const Analysis = ({
     updateAnalysisStartDate,
     updateAccountStatus,
     analyzeAccount,
-    analyzeAllAccount
+    analyzeAllAccount,
+    searchAccount, 
+
 }) => {
     const [isAddAccount, setIsAddAccount] = useState(false);
     const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
     const isDisabled = isAnalysisLoading;
     const [showResultModal, setShowResultModal] = useState(false);
     const [analysisResult, setAnalysisResult] = useState(null); 
+    const [query, setQuery] = useState('');
 
 
     const handleAddAccountClick = () => {
@@ -43,6 +46,17 @@ const Analysis = ({
             setIsAnalysisLoading(false);
         }
     }
+
+    useEffect(() => {
+        const handleSearch = async () => {
+            await searchAccount(query);
+        }
+
+        setTimeout(() => {
+            handleSearch();
+        }, 300);
+    }, [query]);
+
 
     return (
         <div className="flex flex-col mt-3 space-y-3">
@@ -83,6 +97,8 @@ const Analysis = ({
                     {/* Input field on the right */}
                     <input
                         type="text"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
                         className="flex-1 px-3 py-2 text-sm focus:outline-none"
                         placeholder="Type to search..."
                     />
