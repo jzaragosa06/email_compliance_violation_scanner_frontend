@@ -20,12 +20,11 @@ const Violation = ({ account, violations, updateConfirmedViolationStatus, setSel
     }
 
     const [isUpdateDate, setIsUpdateDate] = useState(false);
-    const [startDate, setStartDate] = useState('');
 
     const handleSubmitUpdateDate = async (e) => {
         e.preventDefault();
         try {
-            const utcStartDate = new Date(startDate).toISOString();
+            const utcStartDate = new Date(account.analysis_starting_date).toISOString();
             await updateAnalysisStartDate(account.org_user_account_id, utcStartDate);
 
             //go back to readonly vesion. 
@@ -38,47 +37,6 @@ const Violation = ({ account, violations, updateConfirmedViolationStatus, setSel
 
     return (
         <div className="flex flex-col w-full px-3 py-2">
-            {/* <div className="flex justify-between">
-                <span className="flex flex-col">
-                    <p className="text-sm font-semibold">{account.email}</p>
-                    <p className="text-xs font-light">Added: {toLocalTime(account.created_at)}</p>
-                    {isUpdateDate ? (
-                        <div>
-                            <p className="text-xs font-light">Analysis Starting Date: </p>
-                            <form onSubmit={handleSubmitUpdateDate}>
-                                <input
-                                    type="date"
-                                    value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
-                                />
-                                <button type="submit">
-                                    <CheckIcon className="w-4 h-4 bg-gray-200 " />
-                                </button>
-
-                                <button
-                                    onClick={() => setIsUpdateDate(!isUpdateDate)}
-                                >
-                                    <XMarkIcon className="w-4 h-4 bg-gray-200 " />
-                                </button>
-
-                            </form>
-                        </div>
-
-                    ) : (
-                        <div className="flex gap-x-2">
-                                <p className="text-xs font-light">Analysis started on: {toLocalTime(account.analysis_starting_date)}</p>
-                            <button
-                                onClick={() => setIsUpdateDate(!isUpdateDate)}
-                                className="text-xs p-1 bg-gray-200 hover:bg-gray-300"
-                                >
-                                    Edit
-                                </button>
-
-                        </div>
-                    )}
-                </span>
-                <button className="px-4 py-2 text-sm text-white font-semibold bg-orange-400 rounded-lg hover:bg-orange-500">Analyze</button>
-            </div> */}
             <div className="flex justify-between items-start gap-4">
                 <div className="flex flex-col text-sm space-y-1">
                     <p className="font-semibold">{account.email}</p>
@@ -90,8 +48,8 @@ const Violation = ({ account, violations, updateConfirmedViolationStatus, setSel
                             <form onSubmit={handleSubmitUpdateDate} className="flex items-center gap-2">
                                 <input
                                     type="date"
-                                    value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
+                                    value={account.analysis_starting_date}
+                                    onChange={(e) => setSelectedAccount({ ...account, analysis_starting_date: e.target.value })}
                                     className="text-xs border border-gray-300 rounded px-2 py-1"
                                 />
                                 <button type="submit" className="p-1 rounded hover:bg-gray-300">
