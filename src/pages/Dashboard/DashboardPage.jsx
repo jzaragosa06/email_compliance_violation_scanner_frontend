@@ -8,6 +8,8 @@ import OrganizationFormModal from "./organization/OrganizationFormModal";
 import { useEffect, useState } from "react";
 import UserProfile from "./user/UserProfile";
 import ProfileModal from "./user/ProfileModal";
+import SystemError from "./SystemError";
+import EmptyOrg from "./organization/EmptyOrg";
 
 const Dashboard = () => {
     const {
@@ -68,7 +70,7 @@ const Dashboard = () => {
     }
 
     if (error) {
-        return <div>error: {error}</div>
+        return <SystemError />
     }
 
     return (
@@ -103,25 +105,7 @@ const Dashboard = () => {
                         {renderTabContent()}
                     </>
                 )
-                : (
-                    <div className="w-full flex flex-col items-center justify-center px-6 py-12 rounded-2xl bg-white">
-                        <img
-                            src="https://img.freepik.com/premium-vector/market-research-business-flat-style-illustration-kit_220346-303.jpg"
-                            alt="No records illustration"
-                            className="w-64 h-64 object-contain mb-6"
-                        />
-                        <p className="text-lg text-gray-700 mb-4 text-center">
-                            Hey! You have no organizations registered. Add one to start.
-                        </p>
-                        <button
-                            className="px-6 py-2 bg-orange-400 text-white rounded-xl font-medium hover:bg-orange-500 transition"
-                            onClick={() => setIsAddOrg(true)}
-                        >
-                            Add Organization
-                        </button>
-                    </div>
-
-                )
+                : <EmptyOrg setIsAddOrg={setIsAddOrg} />
             }
             {isAddOrg && <OrganizationFormModal isAddOrg={isAddOrg} setIsAddOrg={setIsAddOrg} addOrganization={addOrganization} />}
 
