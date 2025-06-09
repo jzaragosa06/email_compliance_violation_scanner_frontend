@@ -1,7 +1,15 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import RegisterForm from "./RegisterForm";
+import { handleGoogleAuth } from "../../utils/googleAuth";
 
-export default function Register() {
+const Register = () => {
+    const navigate = useNavigate();
+
+    const handleGoogleClick = async () => {
+        handleGoogleAuth('register', navigate);
+    }
+
+
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
             <div className="w-full max-w-lg bg-white border border-gray-200 p-8 rounded-2xl shadow-xl space-y-6">
@@ -37,7 +45,10 @@ export default function Register() {
                 </div>
 
                 {/* Google Login */}
-                <button className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition duration-200">
+                <button
+                    onClick={handleGoogleClick}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition duration-200"
+                >
                     <img
                         src="https://www.svgrepo.com/show/475656/google-color.svg"
                         alt="Google"
@@ -57,3 +68,5 @@ export default function Register() {
         </div>
     );
 }
+
+export default Register;

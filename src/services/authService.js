@@ -8,3 +8,7 @@ export const registerUser = async (formData) => {
 export const loginUser = async (formData) => {
     return await api.post('/api/auth/user/login/local', formData);
 }
+
+export const createGoogleAuthURL = async (type) => {
+    return await api.get(`/api/auth/user/${type}/google`);
+}
