@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { addOrg, orgManageByUser } from "../services/orgService";
+import { addOrg, orgManageByUser, updateOrgInfos } from "../services/orgService";
 import { updateIsActive, updateScheduleExpression, updateSendEmail } from "../services/managementService";
 
 //these are orgnization manage by user
@@ -135,6 +135,31 @@ export const useOrganization = () => {
         }
     }
 
+    const updateOrgInfo = async (data) => {
+        try {
+            console.log('data', data);
+
+            const response = await updateOrgInfos(selectedOrg.org_id, data);
+            console.log('update orginfo response', response);
+
+            //update organizations
+            setOrganizations((orgs => orgs.map(org =>
+                org.org_id === selectedOrg.org_id
+                    ? { ...org, org_name: data.org_name, org_email: data.org_email, org_phone: data.org_phone, org_description: data.org_description, org_employee_count: data.org_employee_count, org_logo: data.org_logo }
+                    : org
+            )));
+
+            //update selected_org
+            setSelectedOrg((prev) => ({ ...prev, org_name: data.org_name, org_email: data.org_email, org_phone: data.org_phone, org_description: data.org_description, org_employee_count: data.org_employee_count, org_logo: data.org_logo }))
+            return;
+        } catch (error) {
+            console.log(error);
+            console.log(error.message);
+
+
+        }
+    }
+
     useEffect(() => {
         fetchOrganizations();
     }, []);
@@ -150,5 +175,6 @@ export const useOrganization = () => {
         updateRecieveEmail,
         updateAutomateAnalysis,
         updateSchedule, 
+        updateOrgInfo
     }
 }

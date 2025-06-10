@@ -8,7 +8,7 @@ export const useOrgForm = () => {
         org_name: '',
         org_phone: '',
         org_description: '',
-        org_employee_count: null,
+        org_employee_count: '',
         org_logo: '',
     });
 

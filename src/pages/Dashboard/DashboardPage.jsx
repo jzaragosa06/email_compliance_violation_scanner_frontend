@@ -23,7 +23,8 @@ const Dashboard = () => {
         addOrganization,
         updateRecieveEmail,
         updateAutomateAnalysis,
-        updateSchedule
+        updateSchedule, 
+        updateOrgInfo
     } = useOrganization();
 
 
@@ -70,6 +71,7 @@ const Dashboard = () => {
                     updateRecieveEmail={updateRecieveEmail}
                     updateAutomateAnalysis={updateAutomateAnalysis}
                     updateSchedule={updateSchedule}
+                    updateOrgInfo={updateOrgInfo}
                 />;
             case 'policy':
                 return <></>;
