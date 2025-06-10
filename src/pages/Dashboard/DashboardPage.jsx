@@ -10,6 +10,7 @@ import UserProfile from "./user/UserProfile";
 import ProfileModal from "./user/ProfileModal";
 import SystemError from "./SystemError";
 import EmptyOrg from "./organization/EmptyOrg";
+import Organization from "./organization/Organization";
 
 const Dashboard = () => {
     const {
@@ -19,7 +20,10 @@ const Dashboard = () => {
         setSelectedOrg,
         error,
         setError,
-        addOrganization
+        addOrganization,
+        updateRecieveEmail,
+        updateAutomateAnalysis,
+        updateSchedule
     } = useOrganization();
 
 
@@ -61,7 +65,12 @@ const Dashboard = () => {
                     searchAccount={searchAccount}
                 />;
             case 'organization':
-                return <></>;
+                return <Organization
+                    org={selectedOrg}
+                    updateRecieveEmail={updateRecieveEmail}
+                    updateAutomateAnalysis={updateAutomateAnalysis}
+                    updateSchedule={updateSchedule}
+                />;
             case 'policy':
                 return <></>;
             case 'integration':

@@ -18,7 +18,7 @@ const OrganizationSelector = ({ organizations, selectedOrg, setSelectedOrg, setI
     })
 
     return (
-        <div className="relative w-full max-w-3xs py-2">
+        <div className="relative w-full max-w-xs py-2">
             {/* Main Container */}
             <div className="relative ">
                 {/* Floating Label */}
