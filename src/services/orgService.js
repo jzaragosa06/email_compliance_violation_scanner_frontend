@@ -11,3 +11,7 @@ export const addOrg = async (formData) => {
 export const updateOrgInfos = async (org_id, formData) => {
     return await api.patch(`/api/orgs/${org_id}`, formData)
 }
+
+export const fetchViolationHistoriesCount = async (org_id) => {
+    return await api.get(`/api/orgs/${org_id}/violations/history`);
+}

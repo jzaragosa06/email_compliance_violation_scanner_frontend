@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { addOrg, orgManageByUser, updateOrgInfos } from "../services/orgService";
+import { addOrg, fetchViolationHistoriesCount, orgManageByUser, updateOrgInfos } from "../services/orgService";
 import { updateIsActive, updateScheduleExpression, updateSendEmail } from "../services/managementService";
 
 //these are orgnization manage by user
@@ -7,6 +7,7 @@ export const useOrganization = () => {
     const [organizations, setOrganizations] = useState([]);
     const [selectedOrg, setSelectedOrg] = useState(null);
     const [error, setError] = useState(null);
+    const [histories, setHistories] = useState([]); 
 
     const updateRecieveEmail = async (send_email) => {
         try {
@@ -71,38 +72,6 @@ export const useOrganization = () => {
         }
     }
 
-    const fetchOrganizations = async () => {
-        try {
-            const response = await orgManageByUser();
-            console.log('organizations ----', response);
-
-            const orgs = response.data.orgs.map(org => ({
-                management_id: org.management_id,
-                user_id: org.user_id,
-                org_id: org.org_id,
-                org_domain: org.Org.org_domain,
-                org_name: org.Org.OrgInfo.org_name,
-                created_at: org.Org.created_at,
-                org_email: org.Org.OrgInfo.org_email,
-                org_phone: org.Org.OrgInfo.org_phone,
-                org_description: org.Org.OrgInfo.org_description,
-                org_employee_count: org.Org.OrgInfo.org_employee_count,
-                org_logo: org.Org.OrgInfo.org_logo,
-                updated_at: org.Org.OrgInfo.updated_at,
-                is_active: org.ScheduledJob.is_active,
-                send_email: org.ScheduledJob.send_email,
-                scheduled_expression: org.ScheduledJob.scheduled_expression, 
-            }));
-
-            setOrganizations(orgs);
-            setSelectedOrg(orgs[0]);
-        } catch (error) {
-            console.error("Error fetching orgs:", error);
-            setError(error.message);
-        }
-
-    }
-
     const addOrganization = async (data) => {
         try {
             const response = await addOrg(data);
@@ -161,7 +130,58 @@ export const useOrganization = () => {
     }
 
     useEffect(() => {
-        fetchOrganizations();
+        if (!selectedOrg) return;
+
+        const fetchViolationHistories = async () => {
+            try {
+                const response = await fetchViolationHistoriesCount(selectedOrg.org_id);
+                console.log('response history', response);
+
+                //update the hooks
+                setHistories(response.data.histories);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        fetchViolationHistories();
+    }, [selectedOrg])
+
+
+    useEffect(() => {
+        const fetchOrganizations = async () => {
+            try {
+                const response = await orgManageByUser();
+                console.log('organizations ----', response);
+
+                const orgs = response.data.orgs.map(org => ({
+                    management_id: org.management_id,
+                    user_id: org.user_id,
+                    org_id: org.org_id,
+                    org_domain: org.Org.org_domain,
+                    org_name: org.Org.OrgInfo.org_name,
+                    created_at: org.Org.created_at,
+                    org_email: org.Org.OrgInfo.org_email,
+                    org_phone: org.Org.OrgInfo.org_phone,
+                    org_description: org.Org.OrgInfo.org_description,
+                    org_employee_count: org.Org.OrgInfo.org_employee_count,
+                    org_logo: org.Org.OrgInfo.org_logo,
+                    updated_at: org.Org.OrgInfo.updated_at,
+                    is_active: org.ScheduledJob.is_active,
+                    send_email: org.ScheduledJob.send_email,
+                    scheduled_expression: org.ScheduledJob.scheduled_expression,
+                }));
+
+                setOrganizations(orgs);
+                setSelectedOrg(orgs[0]);
+            } catch (error) {
+                console.error("Error fetching orgs:", error);
+                setError(error.message);
+            }
+
+        }
+
+        fetchOrganizations(); 
     }, []);
 
     return {
@@ -175,6 +195,8 @@ export const useOrganization = () => {
         updateRecieveEmail,
         updateAutomateAnalysis,
         updateSchedule, 
-        updateOrgInfo
+        updateOrgInfo,
+        histories,
+        setHistories, 
     }
 }

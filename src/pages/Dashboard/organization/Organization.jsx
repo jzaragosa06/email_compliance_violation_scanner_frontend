@@ -17,23 +17,6 @@ import { Switch } from "@headlessui/react";
 import { mapExpressionToLabel, scheduleExpressions, } from "../../../utils/jobs";
 import { CalendarIcon } from "flowbite-react";
 
-const history = [
-    {
-        id: 1,
-        date_analyzed: new Date().toISOString(),
-        accountsCount: 10,
-        emailsCount: 10,
-        violationsCount: 10,
-    },
-    {
-        id: 2,
-        date_analyzed: new Date().toISOString(),
-        accountsCount: 10,
-        emailsCount: 10,
-        violationsCount: 10,
-    }
-];
-
 const StatCard = ({ icon: Icon, label, value }) => (
     <div className="flex flex-col items-center px-4">
         <div className="w-14 h-14 flex items-center justify-center bg-orange-400 text-white rounded-full">
@@ -58,7 +41,8 @@ const Organization = ({ org,
     updateRecieveEmail,
     updateAutomateAnalysis,
     updateSchedule,
-    updateOrgInfo }) => {
+    updateOrgInfo,
+    histories }) => {
     const [isEditJob, setIsEditJob] = useState(false);
     const [schedExpression, setSchedExpression] = useState(org.scheduled_expression);
     const [isEditOrgInfo, setIsEditOrgInfo] = useState(false);
@@ -203,7 +187,7 @@ const Organization = ({ org,
                     <div className="space-y-4">
                         <div className="flex items-center gap-4">
                             <img
-                                src={org.org_logo}
+                                    src={org.org_logo ? org.org_logo : '/org-logo.jpg'}
                                 className="w-16 h-16 object-contain rounded-lg border border-gray-200"
                                 alt="Organization logo"
                             />
@@ -332,19 +316,24 @@ const Organization = ({ org,
                 <div>
                     <h4 className="text-md font-semibold text-gray-800 mb-2">History</h4>
                     <div className="divide-y text-sm text-gray-600">
-                        {history.map((h) => (
-                            <div key={h.id} className="py-2 flex justify-between items-center">
-                                <div className="flex items-center gap-2">
-                                    <ClockIcon className="w-4 h-4 text-gray-400" />
-                                    <span>{toLocalTime(h.date_analyzed)}</span>
-                                </div>
-                                <div className="flex gap-3 text-xs text-gray-500">
-                                    <span>Accounts: {h.accountsCount}</span>
-                                    <span>Emails: {h.emailsCount}</span>
-                                    <span>Violations: {h.violationsCount}</span>
-                                </div>
-                            </div>
+                        {histories.lenght > 0
+                            ? <>
+                                {histories.map((h, idx) => (
+                                    <div key={idx} className="py-2 flex justify-between items-center">
+                                        <div className="flex items-center gap-2">
+                                            <ClockIcon className="w-4 h-4 text-gray-400" />
+                                            <span>{toLocalTime(h.analysis_run_at)}</span>
+                                        </div>
+                                        <div className="flex gap-3 text-xs text-gray-500">
+                                            {/* <span>Accounts: {h.accountsCount}</span>
+                                        <span>Emails: {h.emailsCount}</span> */}
+                                            <span>Violations: {h.violationCount}</span>
+                                        </div>
+                                    </div>
                         ))}
+                            </>
+                            : <p className="bg-gray-100 text-center font-light text-xs">Nothing to show yet</p>
+                        }
                     </div>
                 </div>
             </div>
